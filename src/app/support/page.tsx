@@ -1,3 +1,4 @@
+'use client'
 export default function SupportPage() {
   return (
     <section className="p-8">

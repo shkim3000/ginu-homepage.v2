@@ -5,9 +5,9 @@ import { ReactNode } from "react";
 
 type SectionWrapperProps = {
   children: ReactNode;
-  delay?: number;       // 전체 섹션 시작 지연
-  stagger?: number;     // 자식 간 간격 (기본 0.12s)
-  direction?: "up" | "down" | "left" | "right"; // 이동 방향
+  delay?: number;
+  stagger?: number;
+  direction?: "up" | "down" | "left" | "right";
 };
 
 export default function SectionWrapper({
@@ -16,7 +16,6 @@ export default function SectionWrapper({
   stagger = 0.12,
   direction = "up",
 }: SectionWrapperProps) {
-  // 방향별 초기값
   const dirMap = {
     up: { y: 40, x: 0 },
     down: { y: -40, x: 0 },
@@ -25,18 +24,22 @@ export default function SectionWrapper({
   };
   const initialPos = dirMap[direction];
 
+  /*
+   * MotionWrapper보다 살짝 늦게 시작 (delay +0.1)
+   * 완전 0 대신 opacity 0.3으로 시작 → 자연스럽게 연결
+  */
   const container = {
     hidden: {},
     show: {
       transition: {
         staggerChildren: stagger,
-        delayChildren: delay,
+        delayChildren: delay + 0.1, // ✅ MotionWrapper보다 살짝 늦게 시작
       },
     },
   };
 
   const item = {
-    hidden: { opacity: 0, ...initialPos },
+    hidden: { opacity: 0.3, ...initialPos }, // ✅ 완전 0 대신 0.3
     show: {
       opacity: 1,
       x: 0,
@@ -53,7 +56,6 @@ export default function SectionWrapper({
       viewport={{ once: true, amount: 0.25 }}
       className="space-y-4"
     >
-      {/* 직계 자식 요소들을 motion.div로 감싸기 */}
       {Array.isArray(children)
         ? children.map((child, idx) => (
             <motion.div key={idx} variants={item}>

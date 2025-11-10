@@ -2,14 +2,18 @@
 
 import { useState } from "react";
 import { useDevice } from "@/hooks/useDevice";
+import { AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 import Header from "@/components/layout/Header";
 import SidebarNav from "@/components/layout/SidebarNav";
+import MotionWrapper from "@/components/common/MotionWrapper"; // ✅ 추가
 import "@/styles/globals.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const { isMobile, isTablet } = useDevice();
   const [isSidebarOpen, setSidebarOpen] = useState(false);
+  const pathname = usePathname(); // ✅ 라우팅 감지용
 
   const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
   const closeSidebar = () => setSidebarOpen(false);
@@ -17,10 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body className="flex flex-col min-h-screen overflow-x-hidden">
-        {/* ✅ scroll-blur 기능은 Header 내부에서 자체적으로 처리 */}
+        {/* ✅ Header는 항상 고정 */}
         <Header onMenuClick={toggleSidebar} />
 
-        {/* 메인 영역 */}
+        {/* ✅ 메인 레이아웃 */}
         <div className="flex pt-[var(--content-top-gap)] min-h-screen bg-gray-50 text-gray-800">
           {/* Sidebar */}
           <SidebarNav
@@ -37,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             />
           )}
 
-          {/* Main Content */}
+          {/* ✅ 메인 콘텐츠 영역 + 페이지 전환 애니메이션 */}
           <main
             className="
               flex-1 overflow-auto
@@ -46,7 +50,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               max-w-screen-xl mx-auto leading-relaxed
             "
           >
-            {children}
+            {/* 
+                exit 애니메이션이 처음 mount 때 실행되지 않도록 initial={false} 추가
+                (첫 페이지 진입 시 깜빡임 방지)
+              */}
+            <AnimatePresence mode="wait" initial={false}>
+              <MotionWrapper key={pathname}>
+                {children}
+              </MotionWrapper>
+            </AnimatePresence>
           </main>
         </div>
       </body>

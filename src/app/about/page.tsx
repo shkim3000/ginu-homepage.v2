@@ -1,3 +1,4 @@
+'use client'
 import SectionWrapper from "@/components/common/SectionWrapper";
 
 export default function AboutPage() {
