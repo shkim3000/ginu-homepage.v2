@@ -1,0 +1,100 @@
+/* src/styles/globals.css */
+@import "./tailwind.css";
+
+:root {
+  --header-height: 64px;
+  --sidebar-width: 256px;
+  --z-header: 50;
+  --z-sidebar: 70;
+  --z-overlay: 60;
+
+  --content-top-gap: 20px; /* header와 콘텐츠 시작 여백 */
+  --content-padding: 2rem; /* 페이지 좌우 기본 여백 */
+  --content-bg: 255 255 255; /* RGB값만 저장 */
+
+  /* RGB 토큰 */
+  --color-primary: 14 165 233;   /* #0EA5E9 */
+  --color-secondary: 3 105 161;  /* #0369A1 */
+
+  --breakpoint-mobile: 640px;   /* 640 px 미만 → 모바일 */
+  --breakpoint-tablet: 1024px;  /* 640–1023 px → 태블릿 */
+                                /* 1024 px 이상 → 데스크탑 */
+}
+
+@media (max-width: 640px) {
+  :root {
+    --header-height: 56px;
+    --sidebar-width: 0px;       /* overlay 모드 */
+    --content-padding: 0.5rem;  /* 약 7px 정도로 자연스러움 */
+    --content-top-gap: 15px;    /* 모바일 header와 콘텐츠 시작 여백 */
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  :root {
+    --header-height: 60px;
+    --sidebar-width: 220px;     /* overlay 모드 */
+    --content-padding: 1rem;  /* 약 14px 정도로 자연스러움 */
+    --content-top-gap: 15px;    /* 태블릿 header와 콘텐츠 시작 여백 */
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-height: 60px;
+    --sidebar-width: 220px;     /* overlay 모드 */
+    --content-padding: 1.5rem;  /* 약 20px 정도로 자연스러움 */
+    --content-top-gap: 15px;    /* PC header와 콘텐츠 시작 여백 */
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+
+body {
+  @apply bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100;
+  font-family: 'Noto Sans KR', system-ui, sans-serif;
+  overflow-x: hidden; /* ✅ 가로 스크롤 방지 */
+}
+
+/* a11y: 스킵링크 */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+}
+.skip-link:focus {
+  left: 0;
+  z-index: 9999;
+  @apply bg-primary text-white p-2;
+}
+
+/* Header scroll-blur 효과 */
+.header-blur {
+  backdrop-filter: blur(var(--blur, 0px));
+  background-color: rgba(255, 255, 255, var(--opacity, 0));
+  transition:
+    backdrop-filter 0.4s ease,
+    background-color 0.4s ease;
+}
+
+.scroll-fade-section {
+  will-change: opacity, transform;
+}
+
+/* ripple 애니메이션 */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 0.6s ease-out forwards;
+  pointer-events: none;
+}
