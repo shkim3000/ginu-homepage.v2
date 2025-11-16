@@ -1,0 +1,16 @@
+@keyframes ripple {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ripple animation */
+.animate-ripple {
+  animation: ripple 0.6s linear;
+}
+
+/* 모바일 하이라이트 제거 (보조) */
+button {
+  -webkit-tap-highlight-color: transparent;
+}

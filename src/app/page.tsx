@@ -7,10 +7,10 @@ export default function HomePage() {
       <h1 className="text-3xl font-bold text-sky-700">Welcome to Ginu</h1>
       <p className="text-gray-600">This is the Home page with interactive buttons.</p>
 
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-center">
         <Button variant="primary">Primary Action</Button>
         <Button variant="secondary">Secondary</Button>
-        <LinkButton href="/about">About Page →</LinkButton>
+        <LinkButton href="/about" variant="outline">About Page →</LinkButton>
       </div>
     </div>
   );

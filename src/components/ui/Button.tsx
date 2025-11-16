@@ -1,7 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, MouseEvent, TouchEvent } from "react";
+import { motionPresets } from "@/motion/presets";
+import useRipple from "@/hooks/useRipple"; // 💧 Step-2 추가
+import { useEffect, useState } from "react";
 
 type ButtonProps = {
   children: React.ReactNode;
@@ -16,61 +18,54 @@ export default function Button({
   className = "",
   variant = "primary",
 }: ButtonProps) {
-  const [ripples, setRipples] = useState<{ x: number; y: number; id: number }[]>([]);
+  const { containerRef, onClick: rippleClick, RippleElements } = useRipple();
+  const [isTouch, setIsTouch] = useState(false); // ✅ 환경 감지
 
-  const createRipple = (x: number, y: number) => {
-    const id = Date.now();
-    setRipples((prev) => [...prev, { x, y, id }]);
-    setTimeout(() => setRipples((prev) => prev.filter((r) => r.id !== id)), 500);
-  };
+  // 🔹 환경 감지 (최초 터치 입력 시 모바일 환경으로 판정)
+  useEffect(() => {
+    const handleFirstTouch = () => setIsTouch(true);
+    window.addEventListener("touchstart", handleFirstTouch, { once: true });
+    return () => window.removeEventListener("touchstart", handleFirstTouch);
+  }, []);
 
-  // ✅ PC 클릭
-  const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    createRipple(e.clientX - rect.left, e.clientY - rect.top);
-    onClick?.();
-  };
-
-  // ✅ 모바일 터치 (즉시 반응)
-  const handleTouchStart = (e: TouchEvent<HTMLButtonElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const touch = e.touches[0];
-    createRipple(touch.clientX - rect.left, touch.clientY - rect.top);
-  };
-
+  // 🔹 variant별 스타일
   const base =
     variant === "primary"
       ? "bg-sky-600 text-white hover:bg-sky-700"
       : "bg-gray-100 text-gray-800 hover:bg-gray-200";
 
+  // 🔹 통합 이벤트 핸들러
+  const handleEvent = (
+    e: React.MouseEvent<HTMLButtonElement> | React.TouchEvent<HTMLButtonElement>
+  ) => {
+    console.log("[Button] handleClicked");
+    rippleClick(e.nativeEvent);
+    onClick?.();
+  };
+
   return (
     <motion.button
-      whileTap={{ scale: 0.97 }}
-      onClick={handleClick}
-      onTouchStart={handleTouchStart}
-      style={{ WebkitTapHighlightColor: "transparent" }}  // ✅ 추가
+      ref={containerRef}
+      variants={motionPresets.uiVariants}
+      initial="initial"
+      whileHover="hover"
+      whileTap="tap"
+      // ✅ 모바일은 touchstart만, PC는 click만
+      {...(isTouch
+        ? { onTouchStart: handleEvent }
+        : { onClick: handleEvent })}
+      style={{
+        WebkitTapHighlightColor: "transparent",
+        touchAction: "manipulation", // ✅ click fallback 제거
+      }}
       className={`
         relative overflow-hidden rounded-lg px-5 py-2.5 font-medium
-        transition-all duration-300 ease-in-out shadow-sm
+        transition-all duration-300 ease-in-out shadow-sm select-none
         ${base} ${className}
       `}
     >
       {children}
-
-      {/* Ripple */}
-      {ripples.map((r) => (
-        <span
-          key={r.id}
-          className="absolute bg-white/60 rounded-full transform scale-0 animate-ripple"
-          style={{
-            left: r.x,
-            top: r.y,
-            width: "160px",
-            height: "160px",
-            opacity: 0.7,
-          }}
-        />
-      ))}
+      {RippleElements}
     </motion.button>
   );
 }

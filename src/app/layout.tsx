@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import Header from "@/components/layout/Header";
 import SidebarNav from "@/components/layout/SidebarNav";
 import MotionWrapper from "@/components/common/MotionWrapper"; // ✅ 추가
+import { FeedbackProvider } from "@/components/micro/FeedbackLayer";
 import "@/styles/globals.css";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ko">
       <body className="flex flex-col min-h-screen overflow-x-hidden">
+        <FeedbackProvider>
         {/* ✅ Header는 항상 고정 */}
         <Header onMenuClick={toggleSidebar} />
 
@@ -61,6 +63,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </AnimatePresence>
           </main>
         </div>
+        </FeedbackProvider>
       </body>
     </html>
   );
