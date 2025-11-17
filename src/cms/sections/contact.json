@@ -1,0 +1,9 @@
+{
+  "type": "ContactSection",
+  "props": {
+    "title": "Contact Us",
+    "description": "Feel free to reach out anytime.",
+    "email": "info@ginu.com",
+    "phone": "+82-10-1234-5678"
+  }
+}

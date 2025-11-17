@@ -4,4 +4,5 @@ export const menuItems = [
   { name: "Business", href: "/business" },
   { name: "Products", href: "/products" },
   { name: "Support", href: "/support" },
+  { name: "Labs", href: "/labs" }
 ];

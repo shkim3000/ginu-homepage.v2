@@ -1,0 +1,8 @@
+{
+  "type": "AboutSection",
+  "props": {
+    "heading": "Who We Are",
+    "description": "We build accessible and intelligent web experiences.",
+    "image": "/images/about.jpg"
+  }
+}

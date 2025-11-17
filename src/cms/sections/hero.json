@@ -1,0 +1,10 @@
+{
+  "type": "HeroSection",
+  "props": {
+    "title": "Welcome to Ginu",
+    "subtitle": "Innovation & Harmony",
+    "image": "/images/hero.jpg",
+    "buttonText": "Learn More",
+    "buttonLink": "/about"
+  }
+}

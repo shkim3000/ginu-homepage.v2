@@ -1,0 +1,41 @@
+{
+  "home": {
+    "slug": "/",
+    "title": "Home",
+    "layout": "DefaultLayout",
+    "sections": [
+      "hero",
+      "about",
+      "features",
+      "contact"
+    ]
+  },
+  "about": {
+    "slug": "/about",
+    "title": "About Us",
+    "layout": "DefaultLayout",
+    "sections": [
+      "intro",
+      "vision",
+      "team"
+    ]
+  },
+  "labs": {
+    "slug": "/labs",
+    "title": "GINU Labs 업데이트 됨",
+    "layout": "DefaultLayout",
+    "sections": [
+      "hero",
+      "about"
+    ]
+  },
+  "careers": {
+    "slug": "/careers",
+    "title": "Careers",
+    "layout": "DefaultLayout",
+    "sections": [
+      "hero",
+      "about"
+    ]
+  }
+}
