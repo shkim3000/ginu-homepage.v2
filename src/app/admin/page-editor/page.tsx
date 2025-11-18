@@ -24,19 +24,17 @@ export default function AdminPageEditor() {
       <div className="w-[220px] border-r border-gray-200 p-4 overflow-y-auto">
         <h2 className="font-bold text-lg mb-4">Pages</h2>
         <ul className="space-y-2">
-          {pageKeys.map((key) => (
-            <li
+          {Object.entries(pages).map(([key, p]) => (
+            <button
               key={key}
-              className={`cursor-pointer hover:text-blue-500 ${
-                selectedPage === key ? "text-blue-600 font-bold" : ""
-              }`}
               onClick={() => {
-                setSelectedPage(key);
-                setJsonText(JSON.stringify(pages[key], null, 2));
+                setSelectedPage({ ...p, key });  // ⭐ key 저장
+                setJsonText(JSON.stringify(p, null, 2));
               }}
+              className="block w-full text-left px-2 py-1 hover:bg-gray-100"
             >
-              {key}
-            </li>
+              {p.title}
+            </button>
           ))}
         </ul>
       </div>
@@ -53,7 +51,49 @@ export default function AdminPageEditor() {
 
         <button
           className="mt-4 bg-blue-600 text-white px-4 py-2 rounded shadow hover:bg-blue-700"
-          onClick={() => alert("Save 기능은 WP-7.5-3에서 구현되었습니다.")}
+          onClick={async () => {
+            if (!selectedPage) {
+              alert("No page selected.");
+              return;
+            }
+
+            // 1) JSON 파싱
+            let parsed: any;
+            try {
+              parsed = JSON.parse(jsonText);
+            } catch (err) {
+              alert("Invalid JSON format.");
+              return;
+            }
+
+            // 2) pages.json 전체 객체 생성
+            const updatedPages = {
+              ...pages,
+              [selectedPage.key]: parsed, // 해당 페이지만 업데이트
+            };
+
+            // 3) 저장 요청
+            try {
+              const res = await fetch("/api/cms/save", {
+                method: "POST",
+                body: JSON.stringify({
+                  target: "page",
+                  filename: "pages.json",
+                  data: updatedPages,
+                }),
+              });
+
+              if (!res.ok) {
+                throw new Error("Save failed");
+              }
+
+              alert("Saved successfully!");
+              location.reload(); // 최신 pages.json 로딩
+            } catch (err) {
+              console.error(err);
+              alert("Failed to save pages.json");
+            }
+          }}
         >
           Save
         </button>
@@ -71,6 +111,17 @@ export default function AdminPageEditor() {
               <h1 className="text-2xl font-bold mb-6">{previewData.title}</h1>
               <PageRenderer page={previewData} />
             </>
+          )}
+        </div>
+
+        <div >
+          {selectedPage && (
+            <a
+              href={`/admin/page-editor/${selectedPage.key}`}
+              className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Edit Sections →
+            </a>
           )}
         </div>
       </div>

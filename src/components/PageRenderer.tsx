@@ -1,60 +1,83 @@
+// src/components/cms/PageRenderer.tsx
 "use client";
 
-import dynamic from "next/dynamic";
-import sections from "@/cms/sections/sections-index";
 import { Fragment } from "react";
+import { SectionMap } from "@/components/cms/SectionRenderer";
+import templateMap from "@/cms/templates-index";
+
+type SectionEntry = {
+  id: string;
+  template?: string;     // 새 구조
+  type?: string;         // 과거 호환용
+  props?: Record<string, any>;
+};
 
 type CMSPage = {
   title: string;
   layout: string;
-  sections: string[];
+  sections: SectionEntry[];
 };
 
 /**
- * Dynamic Page Renderer
- * - pages.json에서 받아온 page.sections[]를 읽어
- * - 섹션 JSON → 섹션 컴포넌트 자동 import → 렌더링
- * --------------------------------------------
- * PageRenderer 동작 흐름
- * pages.json         ## (@/cms/pages.json)
- *    ↓        (page.sections = ["hero", "about", ...])
- * sections-index.js  ## (@/cms/sections/section-index.js)
- *    ↓
- * hero.json → { type: "HeroSection", props: {...} }
- *    ↓
- * import("@/components/sections/HeroSection")
- *    ↓
- * <HeroSection {...props} />
+ * PageRenderer
+ * ----------------------------------------
+ * - page.sections[] 에서 { id, template, type, props }를 읽고
+ * - templateMap에서 템플릿 기본값(type, props) 조회
+ * - baseProps (template.props) + override props (section.props) merge
+ * - SectionMap[type] 컴포넌트를 찾아 렌더링
  */
 export default function PageRenderer({ page }: { page: CMSPage }) {
   if (!page || !page.sections) return null;
 
   return (
     <Fragment>
-      {page.sections.map((sectionId) => {
-        const sectionData = sections[sectionId];
+      {page.sections.map((entry, index) => {
+        const id = entry.id;
+        const templateKey = entry.template || entry.type; // HeroSection, AboutSection ...
+        const overrideProps = entry.props || {};
 
-        if (!sectionData) {
-          console.warn(`⚠ Unknown section: ${sectionId}`);
-          return null;
+        if (!templateKey) {
+          return (
+            <div
+              key={id}
+              className="p-4 bg-red-100 border text-red-600"
+            >
+              Missing field: template/type for section id "{id}"
+            </div>
+          );
         }
 
-        // type → 컴포넌트명
-        const ComponentName = sectionData.type;
+        // 1) 템플릿 정의 조회
+        const templateDef = (templateMap as any)[templateKey];
 
-        // dynamic import
-        const SectionComponent = dynamic(
-          () => import(`@/components/sections/${ComponentName}`),
-          { ssr: false }
-        );
+        // type 결정: 템플릿에 type이 있으면 우선, 없으면 templateKey 그대로 사용
+        const componentKey = templateDef?.type || templateKey;
 
-        // props → JSON에서 불러온 데이터
-        const props = sectionData.props || {};
+        // 2) 실제 React 컴포넌트 찾기
+        const Renderer = (SectionMap as any)[componentKey];
+
+        if (!Renderer) {
+          return (
+            <div
+              key={id}
+              className="p-4 bg-red-100 border text-red-600"
+            >
+              Missing component for type "{componentKey}"
+            </div>
+          );
+        }
+
+        // 3) 템플릿 기본 props + override props merge
+        const baseProps = (templateDef?.props || {}) as Record<string, any>;
+        const mergedProps = {
+          ...baseProps,
+          ...overrideProps,
+        };
 
         return (
-          <SectionComponent
-            key={sectionId}
-            {...props}
+          <Renderer
+            key={`${id}-${index}`}
+            {...mergedProps}
           />
         );
       })}

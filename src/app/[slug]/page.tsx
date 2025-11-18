@@ -28,10 +28,15 @@ import pages from "@/cms/pages.json";
 /*
  * pages.json 구조랑 1:1 매칭되는 타입
  */
+type SectionEntry = {
+  id: string;
+  props?: Record<string, any>;
+};
+
 type CMSPage = {
   title: string;
   layout: string;
-  sections: string[];
+  sections: SectionEntry[];
 };
 
 type PageProps = {
