@@ -7,8 +7,8 @@ import templateMap from "@/cms/templates-index";
 
 type SectionEntry = {
   id: string;
-  template?: string;     // 새 구조
-  type?: string;         // 과거 호환용
+  template?: string;
+  type?: string; // 과거 호환용
   props?: Record<string, any>;
 };
 
@@ -19,12 +19,10 @@ type CMSPage = {
 };
 
 /**
- * PageRenderer
- * ----------------------------------------
- * - page.sections[] 에서 { id, template, type, props }를 읽고
- * - templateMap에서 템플릿 기본값(type, props) 조회
- * - baseProps (template.props) + override props (section.props) merge
- * - SectionMap[type] 컴포넌트를 찾아 렌더링
+ * PageRenderer (WP-7.11)
+ * - pages.json의 sections[] 에서 { id, template/type, props } 를 읽고
+ * - 템플릿 기본 props + override props 를 merge 해서 렌더링
+ * - SectionMap[type] 으로 실제 React 컴포넌트를 찾아 렌더링
  */
 export default function PageRenderer({ page }: { page: CMSPage }) {
   if (!page || !page.sections) return null;
@@ -33,53 +31,49 @@ export default function PageRenderer({ page }: { page: CMSPage }) {
     <Fragment>
       {page.sections.map((entry, index) => {
         const id = entry.id;
-        const templateKey = entry.template || entry.type; // HeroSection, AboutSection ...
-        const overrideProps = entry.props || {};
+        const type = entry.type || entry.template; // template 우선, 없으면 type
 
-        if (!templateKey) {
+        if (!type) {
           return (
             <div
               key={id}
-              className="p-4 bg-red-100 border text-red-600"
+              className="p-4 bg-red-100 border border-red-300 text-red-700"
             >
-              Missing field: template/type for section id "{id}"
+              Missing field <b>type/template</b> for section id: <b>{id}</b>
             </div>
           );
         }
 
-        // 1) 템플릿 정의 조회
-        const templateDef = (templateMap as any)[templateKey];
-
-        // type 결정: 템플릿에 type이 있으면 우선, 없으면 templateKey 그대로 사용
-        const componentKey = templateDef?.type || templateKey;
-
-        // 2) 실제 React 컴포넌트 찾기
-        const Renderer = (SectionMap as any)[componentKey];
+        const Renderer = SectionMap[type];
 
         if (!Renderer) {
+          console.warn(`PageRenderer: Unknown section type → ${type}`);
           return (
             <div
               key={id}
-              className="p-4 bg-red-100 border text-red-600"
+              className="p-4 bg-red-100 border border-red-300 text-red-700"
             >
-              Missing component for type "{componentKey}"
+              Missing component for section type: <b>{type}</b>
             </div>
           );
         }
 
-        // 3) 템플릿 기본 props + override props merge
-        const baseProps = (templateDef?.props || {}) as Record<string, any>;
+        // 1) 템플릿 기본 props
+        const templateDef =
+          (templateMap as any)[type] || (templateMap as any)[entry.template || ""];
+
+        const baseProps = (templateDef && templateDef.props) || {};
+
+        // 2) 섹션에 저장된 override props
+        const overrideProps = entry.props || {};
+
+        // 3) merge (base < override)
         const mergedProps = {
           ...baseProps,
           ...overrideProps,
         };
 
-        return (
-          <Renderer
-            key={`${id}-${index}`}
-            {...mergedProps}
-          />
-        );
+        return <Renderer key={`${id}-${index}`} {...mergedProps} />;
       })}
     </Fragment>
   );

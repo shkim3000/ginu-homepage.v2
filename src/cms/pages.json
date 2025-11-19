@@ -1,88 +1,22 @@
 {
-  "home": {
-    "slug": "/",
-    "title": "Home",
-    "layout": "DefaultLayout",
-    "sections": [
-      {
-        "id": "hero_1",
-        "template": "HeroSection",
-        "props": {}
+  "slug": "/labs",
+  "title": "GINU Labs",
+  "layout": "DefaultLayout",
+  "sections": [
+    {
+      "id": "hero_173981",
+      "template": "HeroSection",
+      "props": {
+        "title": "Welcome to GINU",
+        "buttonText": "About Me"
       },
-      {
-        "id": "about_1",
-        "template": "AboutSection",
-        "props": {}
-      },
-      {
-        "id": "features_1",
-        "template": "ContactSection",
-        "props": {}
-      },
-      {
-        "id": "contact_1",
-        "template": "ContactSection",
-        "props": {}
-      }
-    ]
-  },
-
-  "about": {
-    "slug": "/about",
-    "title": "About Us",
-    "layout": "DefaultLayout",
-    "sections": [
-      {
-        "id": "intro_1",
-        "template": "HeroSection",
-        "props": {}
-      },
-      {
-        "id": "vision_1",
-        "template": "AboutSection",
-        "props": {}
-      },
-      {
-        "id": "team_1",
-        "template": "ContactSection",
-        "props": {}
-      }
-    ]
-  },
-
-  "labs": {
-    "slug": "/labs",
-    "title": "GINU Labs",
-    "layout": "DefaultLayout",
-    "sections": [
-      {
-        "id": "hero_173981",
-        "template": "HeroSection",
-        "props": {}
-      },
-      {
-        "id": "about_173982",
-        "template": "AboutSection",
-        "props": {}
-      }
-    ]
-  },
-
-  "careers": {
-    "slug": "/careers",
-    "title": "Careers",
-    "layout": "DefaultLayout",
-    "sections": [
-      {
-        "id": "hero_2",
-        "template": "HeroSection",
-        "props": {}
-      },
-      {
-        "id": "about_2",
-        "template": "AboutSection",
-        "props": {}
-      }
-    ]
-  }
+      "type": "HeroSection"
+    },
+    {
+      "id": "about_173982",
+      "template": "AboutSection",
+      "props": {},
+      "type": "AboutSection"
+    }
+  ]
 }

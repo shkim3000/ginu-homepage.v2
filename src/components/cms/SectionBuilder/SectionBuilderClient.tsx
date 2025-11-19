@@ -107,6 +107,7 @@ export default function SectionBuilderClient({ slug }: { slug: string }) {
         body: JSON.stringify({
           target: "page",
           filename: "pages.json",
+          pageKey: slug,           // ★ labs or home 같은 page key
           data: {
             ...pageData,
             sections,

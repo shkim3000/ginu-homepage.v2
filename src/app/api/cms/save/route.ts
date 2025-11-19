@@ -1,50 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile } from "fs/promises";
+import { writeFile, readFile } from "fs/promises";
 import path from "path";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { target, filename, data } = body;
+    const { target, filename, data, pageKey } = body;
 
-    if (!target || !filename || !data) {
+    if (!target || !filename || data) {
       return NextResponse.json(
         { error: "Invalid payload" },
         { status: 400 }
       );
     }
 
-    // cms 디렉토리 기준 경로 구성
     const baseDir = path.join(process.cwd(), "src", "cms");
-
     let filePath = "";
 
-    // 1) pages.json 저장 요청
+    /** -------------------------
+     * ① Page 전체 업데이트 요청
+     * ------------------------- */
     if (target === "page") {
       filePath = path.join(baseDir, "pages.json");
+
+      // 기존 pages.json 읽기
+      const raw = await readFile(filePath, "utf-8");
+      const pages = JSON.parse(raw);
+
+      if (!pageKey) {
+        return NextResponse.json(
+          { error: "Missing pageKey" },
+          { status: 400 }
+        );
+      }
+
+      // pageKey에 해당하는 페이지만 업데이트
+      pages[pageKey] = data;
+
+      await writeFile(filePath, JSON.stringify(pages, null, 2), "utf-8");
+      return NextResponse.json({ success: true });
     }
 
-    // 2) 특정 섹션 저장 요청
-    else if (target === "section") {
-      filePath = path.join(baseDir, "sections", filename);
-    }
-
-    // 3) 에러 처리
-    else {
-      return NextResponse.json(
-        { error: "Invalid target type" },
-        { status: 400 }
-      );
-    }
-
-    // 파일 저장
-    await writeFile(filePath, JSON.stringify(data, null, 2), "utf-8");
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ error: "Invalid target" }, { status: 400 });
   } catch (e) {
-    console.error("Save error:", e);
     return NextResponse.json(
-      { error: "Failed to save JSON", details: String(e) },
+      { error: "Save failed", details: String(e) },
       { status: 500 }
     );
   }
